@@ -6,7 +6,6 @@
     <h1>Bienvenue sur la plateforme de déclaration d'incidents</h1>
 
     <a class="btn btn-outline-primary" href="{{ path('app_report_incident') }}">Déclarer un incident</a>
-    <a class="btn btn-outline-warning" href="{{ path('app_backoffice_incident_index') }}">Backoffice incidents</a>
 
     {# read and display several types of flash messages #}
     {% for label, messages in app.flashes(['success', 'warning']) %}

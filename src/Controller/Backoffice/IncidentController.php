@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 use function PHPUnit\Framework\throwException;
 
 #[Route('/backoffice/incidents')]
@@ -36,7 +37,6 @@ class IncidentController extends AbstractController
     #[Route('/{id}/process', name: 'app_backoffice_incident_process', methods: ['GET'])]
     public function markAsProcessed(Incident $incident, IncidentRepository $incidentRepository,StatusRepository $statusRepository): Response
     {
-
         if(!$incident->getProcessedAt()){
             $incident->setProcessedAt(new DateTimeImmutable('now',new \DateTimeZone('Europe/Paris')));
             $incident->setStatus($statusRepository->findOneBy(["normalized"=>"PROCESSING"]));

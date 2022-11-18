@@ -6,18 +6,28 @@ use App\Entity\Level;
 use App\Entity\Status;
 use App\Entity\Incident;
 use App\Entity\Type;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+
+    public function __construct(
+        private readonly UserPasswordHasherInterface $hasher
+    )
+    {
+    }
+
     public function load(ObjectManager $manager): void
     {
         $this->loadLevels($manager);
         $this->loadStatus($manager);
         $this->loadTypes($manager);
         $this->loadTickets($manager);
+        $this->loadUsers($manager);
     }
 
     private function loadLevels(ObjectManager $manager){
@@ -114,6 +124,19 @@ class AppFixtures extends Fixture
 
         }
 
+        $manager->flush();
+    }
+
+    private function loadUsers(ObjectManager $manager)
+    {
+        $users = ["admin@mail.dev"];
+
+        foreach ($users as $email) {
+            $user = new User();
+            $user->setEmail($email);
+            $user->setPassword($this->hasher->hashPassword($user, 'password'));
+            $manager->persist($user);
+        }
         $manager->flush();
     }
 

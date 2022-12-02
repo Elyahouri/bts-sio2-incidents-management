@@ -54,6 +54,9 @@ class Incident
     #[ORM\ManyToMany(targetEntity: Type::class, inversedBy: 'incidents')]
     private Collection $types;
 
+    #[ORM\ManyToOne(inversedBy: 'incidents')]
+    private ?User $followedBy = null;
+
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable('now',new \DateTimeZone('Europe/Paris'));
@@ -206,6 +209,18 @@ class Incident
     public function removeType(Type $type): self
     {
         $this->types->removeElement($type);
+
+        return $this;
+    }
+
+    public function getFollowedBy(): ?User
+    {
+        return $this->followedBy;
+    }
+
+    public function setFollowedBy(?User $followedBy): self
+    {
+        $this->followedBy = $followedBy;
 
         return $this;
     }

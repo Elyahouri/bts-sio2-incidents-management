@@ -5,6 +5,7 @@
 {% block body %}
     <h1>Liste des incidents</h1>
     <a class="btn btn-outline-warning" href="{{ path('app_welcome') }}">Retour à la homepage</a>
+    <p>{{ incidents|length }} Incidents</p>
     <table class="table">
         <thead>
             <tr>
@@ -12,6 +13,9 @@
                 <th>Date de création</th>
                 <th>Priorité</th>
                 <th>Status</th>
+                {% if is_granted('ROLE_ADMIN')%}
+                    <th>Technicien</th>
+                {% endif %}
                 <th>Actions</th>
             </tr>
         </thead>
@@ -42,6 +46,11 @@
                         <span class="badge text-bg-danger">{{ incident.status.label }}</span>
                     {% endif %}
                 </td>
+                {% if is_granted('ROLE_ADMIN')%}
+                    <td>
+                        {{ incident.followedBy ? incident.followedBy.email : 'Non assigné' }}
+                    </td>
+                {% endif %}
                 <td>
                     <a class="btn btn-outline-primary" href="{{ path('app_backoffice_incident_show', {'id': incident.id}) }}">Détails</a>
                 </td>

@@ -56,6 +56,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
+    public function findTech()
+    {
+        $query = $this->getEntityManager()->createQuery(
+            "SELECT u FROM App\Entity\User u WHERE u.roles LIKE :v")->setParameter('v','%'.'ROLE_TECH'.'%');
+
+        return $query->getResult();
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

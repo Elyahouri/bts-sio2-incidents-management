@@ -74,16 +74,25 @@
                         </div>
                         <div class="col-3">
                             <div class="vstack gap-3">
-                                {% if not incident.processedAt and not incident.rejectedAt %}
-                                    <a class="btn btn-outline-primary" href="{{ path('app_backoffice_incident_process',{'id':incident.id}) }}">Traiter l'incident</a>
-                                {% endif %}
-                                {% if incident.processedAt and not incident.resolveAt and not incident.rejectedAt %}
-                                    <a class="btn btn-outline-success" href="{{ path('app_backoffice_incident_resolve',{'id':incident.id}) }}">Marquer comme résolu</a>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    {% if not incident.followedBy %}
+                                        <a class="btn btn-outline-info" href="{{ path('app_backoffice_assign',{'id':incident.id}) }}">Assigne</a>
+                                    {% else %}
+                                        <p>Le ticket est déjà assigné à {{ incident.followedBy.email }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    {% if not incident.processedAt and not incident.rejectedAt %}
+                                        <a class="btn btn-outline-primary" href="{{ path('app_backoffice_incident_process',{'id':incident.id}) }}">Traiter l'incident</a>
+                                    {% endif %}
+                                    {% if incident.processedAt and not incident.resolveAt and not incident.rejectedAt %}
+                                        <a class="btn btn-outline-success" href="{{ path('app_backoffice_incident_resolve',{'id':incident.id}) }}">Marquer comme résolu</a>
+                                    {% endif %}
+
+                                    {% if not incident.rejectedAt and not incident.resolveAt %}
+                                        <a class="btn btn-outline-danger" href="{{ path('app_backoffice_incident_reject',{'id':incident.id}) }}">Marquer comme rejeté</a>
+                                    {% endif %}
                                 {% endif %}
 
-                                {% if not incident.rejectedAt and not incident.resolveAt %}
-                                    <a class="btn btn-outline-danger" href="{{ path('app_backoffice_incident_reject',{'id':incident.id}) }}">Marquer comme rejeté</a>
-                                {% endif %}
                             </div>
                         </div>
                     </div>

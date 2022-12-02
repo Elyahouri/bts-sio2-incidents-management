@@ -46,9 +46,11 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
+        $redirecturl =  $token->getRoleNames() === ['ROLE_LOCK'] ? 'app_backoffice_lock_account' : 'app_backoffice_incident_index';
+
         // For example:
-        return new RedirectResponse($this->urlGenerator->generate('app_backoffice_incident_index'));
-        //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        return new RedirectResponse($this->urlGenerator->generate($redirecturl));
+
     }
 
     protected function getLoginUrl(Request $request): string

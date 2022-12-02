@@ -26,8 +26,9 @@ class AppFixtures extends Fixture
         $this->loadLevels($manager);
         $this->loadStatus($manager);
         $this->loadTypes($manager);
-        $this->loadTickets($manager);
         $this->loadUsers($manager);
+        $this->loadTickets($manager);
+
     }
 
     private function loadLevels(ObjectManager $manager){
@@ -87,12 +88,14 @@ class AppFixtures extends Fixture
         $types = $manager->getRepository(Type::class)->findAll();
         $statuses = $manager->getRepository(Status::class)->findAll();
         $levels = $manager->getRepository(Level::class)->findAll();
+        $techs = $manager->getRepository(User::class)->findTech();
 
         for($i = 0; $i< 50;$i++){
 
             $typeskeys = array_rand($types,rand(2,4));
             $levelKey = array_rand($levels,1);
             $statusKey = array_rand($statuses,1);
+            $tecksKey = array_rand($techs, 1);
 
             $ticket = new Incident();
             $ticket->setReporterEmail($faker->email);
@@ -101,14 +104,23 @@ class AppFixtures extends Fixture
             $ticket->setStatus($statuses[$statusKey]);
 
             switch ($ticket->getStatus()->getNormalized()){
+                case 'NEW':
+                    if (rand(0,1))
+                    {
+                        $ticket->setFollowedBy($techs[$tecksKey]);
+                    }
+                    break;
                 case "PROCESSING":
+                    $ticket->setFollowedBy($techs[$tecksKey]);
                     $ticket->setProcessedAt($ticket->getCreatedAt()->modify("+1 day"));
                     break;
                 case "REJECTED":
+                    $ticket->setFollowedBy($techs[$tecksKey]);
                     $ticket->setProcessedAt($ticket->getCreatedAt()->modify("+1 day"));
                     $ticket->setRejectedAt($ticket->getCreatedAt()->modify("+2 day"));
                     break;
                 case "RESOLVED":
+                    $ticket->setFollowedBy($techs[$tecksKey]);
                     $ticket->setProcessedAt($ticket->getCreatedAt()->modify("+1 day"));
                     $ticket->setResolveAt($ticket->getCreatedAt()->modify("+2 day"));
                     break;
@@ -129,15 +141,23 @@ class AppFixtures extends Fixture
 
     private function loadUsers(ObjectManager $manager)
     {
-        $users = ["admin@mail.dev"];
+        $users =
+            [
+                ["email" => "admin@admin.com","roles" => ["ROLE_ADMIN"]],
+                ["email" => "tech@tech.com","roles" => ["ROLE_TECH"]],
+                ["email" => "tech2@tech2.com","roles" => ["ROLE_TECH"]],
+                ["email" => "lokc@lock.com","roles" => ["ROLE_LOCK"]]
+            ];
 
-        foreach ($users as $email) {
+        foreach ($users as $data) {
             $user = new User();
-            $user->setEmail($email);
+            $user->setEmail($data["email"]);
+            $user->setRoles($data["roles"]);
             $user->setPassword($this->hasher->hashPassword($user, 'password'));
             $manager->persist($user);
         }
         $manager->flush();
     }
+
 
 }
